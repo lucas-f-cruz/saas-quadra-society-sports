@@ -1,0 +1,116 @@
+// Schema do ProFlow — SaaS de agendamento de quadras
+// Modelo multi-tenant: tudo pendura na Arena (o cliente que assina o SaaS)
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+enum PeriodoDia {
+  MANHA
+  TARDE
+  NOITE
+}
+
+enum StatusReserva {
+  PENDENTE_PAGAMENTO
+  CONFIRMADO
+  CANCELADO
+}
+
+enum TipoPagamento {
+  CINQUENTA_ANTES   // jogador paga 50% na hora da reserva, resto no local
+  CEM_ANTES         // jogador paga 100% na hora da reserva
+  SEM_ANTECIPACAO   // não cobra nada antes — paga tudo presencialmente
+}
+
+// Você mesmo (dono do SaaS) — separado dos Usuarios (donos de arena).
+// Login próprio, usado só na área /master pra cadastrar clientes novos.
+model AdminMaster {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  senhaHash String
+  criadoEm  DateTime @default(now())
+}
+
+model Arena {
+  id            String        @id @default(cuid())
+  nome          String
+  slug          String        @unique // usado na URL pública: proflow.com/arena-central
+  telefone      String?
+  whatsapp      String?
+  instagram     String?
+  logoUrl       String?       @db.Text
+  criadoEm      DateTime      @default(now())
+
+  chavePix      String?
+  cidadePix     String?       @default("BRASIL")
+  tipoPagamento TipoPagamento @default(CEM_ANTES)
+
+  usuarios      Usuario[]
+  quadras       Quadra[]
+}
+
+model Usuario {
+  id            String   @id @default(cuid())
+  nome          String
+  email         String   @unique
+  senhaHash     String
+  tokenVersion  Int      @default(0) // incrementa a cada login — invalida sessões antigas
+  criadoEm      DateTime @default(now())
+
+  arenaId       String
+  arena         Arena    @relation(fields: [arenaId], references: [id])
+}
+
+model Quadra {
+  id        String   @id @default(cuid())
+  nome      String   // ex: "Quadra 1", "Campo Society"
+  tipo      String   // ex: "society", "beach tennis", "futsal"
+  criadoEm  DateTime @default(now())
+
+  arenaId   String
+  arena     Arena    @relation(fields: [arenaId], references: [id])
+
+  regrasPreco RegraPreco[]
+  reservas    Reserva[]
+}
+
+// Define preço e duração padrão de horário por período do dia.
+// Ex: MANHA/TARDE = R$120, duracaoMinutos=60 | NOITE = R$140, duracaoMinutos=60
+model RegraPreco {
+  id              String     @id @default(cuid())
+  periodo         PeriodoDia
+  horaInicio      String     // "08:00"
+  horaFim         String     // "18:00"
+  duracaoMinutos  Int        // 60 ou 90
+  preco           Decimal    @db.Decimal(10, 2)
+
+  quadraId        String
+  quadra          Quadra     @relation(fields: [quadraId], references: [id])
+}
+
+model Reserva {
+  id            String        @id @default(cuid())
+  data          DateTime      // dia da reserva (sem hora)
+  horaInicio    String        // "19:00"
+  horaFim       String        // "20:00"
+  status        StatusReserva @default(PENDENTE_PAGAMENTO)
+  valor         Decimal       @db.Decimal(10, 2)
+
+  jogadorNome   String
+  jogadorTelefone String
+  jogadorEmail  String?
+
+  criadoEm      DateTime      @default(now())
+
+  quadraId      String
+  quadra        Quadra        @relation(fields: [quadraId], references: [id])
+
+  // Evita duas reservas ativas no mesmo horário da mesma quadra
+  @@unique([quadraId, data, horaInicio])
+}

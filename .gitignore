@@ -1,0 +1,26 @@
+# Dependências
+node_modules/
+proflow-backend/node_modules/
+proflow-admin/node_modules/
+
+# Variáveis de ambiente (contém senhas e chaves — NUNCA versionar)
+.env
+.env.local
+proflow-backend/.env
+proflow-admin/.env
+
+# Builds
+proflow-admin/dist/
+proflow-backend/dist/
+
+# Prisma
+proflow-backend/prisma/dev.db
+
+# Editor / sistema
+.vscode/
+.DS_Store
+*.log
+npm-debug.log*
+
+# Vite
+proflow-admin/.vite/
