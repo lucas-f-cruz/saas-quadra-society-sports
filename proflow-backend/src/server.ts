@@ -14,7 +14,14 @@ dotenv.config();
 
 const app = express();
 
-app.use(cors());
+// Em produção, defina CORS_ORIGIN no .env com o domínio real do painel
+// (ex: https://proflow-admin.vercel.app). Sem essa variável, aceita
+// qualquer origem — ok pra desenvolvimento local, mas não pra produção.
+const origensPermitidas = process.env.CORS_ORIGIN
+  ? process.env.CORS_ORIGIN.split(',').map((o) => o.trim())
+  : true;
+
+app.use(cors({ origin: origensPermitidas }));
 app.use(express.json());
 
 // Rotas públicas
