@@ -46,6 +46,14 @@ app.get('/health', (_req, res) => {
   res.json({ status: 'ok' });
 });
 
+// Rede de segurança: qualquer erro que escape de uma rota cai aqui, em vez de
+// derrubar o processo inteiro (o que faria o navegador ver "Failed to fetch"/
+// erro de CORS, mesmo quando o problema real era outro).
+app.use((err: Error, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
+  console.error('Erro não tratado:', err);
+  res.status(500).json({ erro: 'Erro interno do servidor' });
+});
+
 const PORT = process.env.PORT || 3333;
 app.listen(PORT, () => {
   console.log(`ProFlow backend rodando na porta ${PORT}`);

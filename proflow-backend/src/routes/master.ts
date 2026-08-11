@@ -168,11 +168,16 @@ router.post('/arenas', async (req, res) => {
 // Exclui uma arena e tudo relacionado a ela (quadras, horários, reservas, o
 // usuário dono) — ação irreversível.
 router.delete('/arenas/:id', async (req, res) => {
-  const arena = await prisma.arena.findUnique({ where: { id: req.params.id } });
-  if (!arena) return res.status(404).json({ erro: 'Arena não encontrada' });
+  try {
+    const arena = await prisma.arena.findUnique({ where: { id: req.params.id } });
+    if (!arena) return res.status(404).json({ erro: 'Arena não encontrada' });
 
-  await prisma.arena.delete({ where: { id: req.params.id } });
-  res.status(204).send();
+    await prisma.arena.delete({ where: { id: req.params.id } });
+    res.status(204).send();
+  } catch (err) {
+    console.error('Erro ao excluir arena:', err);
+    res.status(500).json({ erro: 'Erro ao excluir arena' });
+  }
 });
 
 export default router;
