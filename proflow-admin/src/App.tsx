@@ -4,7 +4,9 @@ import { MasterAuthProvider } from './context/MasterAuthContext';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { MasterProtectedRoute } from './components/MasterProtectedRoute';
 import { Login } from './pages/Login';
-import { Signup } from './pages/Signup';
+// Cadastro público desativado — agora só o admin master cria clientes novos.
+// Descomente a linha abaixo e a rota /signup mais adiante se precisar reativar.
+// import { Signup } from './pages/Signup';
 import { PublicBooking } from './pages/PublicBooking';
 import { Dashboard } from './pages/Dashboard';
 import { Quadras } from './pages/Quadras';
@@ -21,7 +23,7 @@ export default function App() {
         <BrowserRouter>
           <Routes>
             <Route path="/login" element={<Login />} />
-            <Route path="/signup" element={<Signup />} />
+            {/* <Route path="/signup" element={<Signup />} /> */}
             <Route path="/agendar/:slug" element={<PublicBooking />} />
 
             <Route path="/master/login" element={<MasterLogin />} />

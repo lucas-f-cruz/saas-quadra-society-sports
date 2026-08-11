@@ -24,6 +24,13 @@ const origensPermitidas = process.env.CORS_ORIGIN
 app.use(cors({ origin: origensPermitidas }));
 app.use(express.json());
 
+// Impede o navegador de guardar em cache as respostas da API — sem isso,
+// reabrir uma tela logo depois de salvar pode mostrar dado antigo (304).
+app.use((_req, res, next) => {
+  res.set('Cache-Control', 'no-store');
+  next();
+});
+
 // Rotas públicas
 app.use('/auth', authRoutes);
 app.use('/public', publicRoutes);

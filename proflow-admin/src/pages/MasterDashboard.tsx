@@ -128,6 +128,18 @@ export function MasterDashboard() {
     }
   }
 
+  async function handleExcluir(id: string, nome: string) {
+    if (!confirm(`Excluir "${nome}"? Isso apaga a arena, as quadras, os horários e as reservas dela — não dá pra desfazer.`)) return;
+    if (!confirm('Tem certeza mesmo? Essa ação é definitiva.')) return;
+    setErro(null);
+    try {
+      await masterApi.delete(`/master/arenas/${id}`);
+      await carregarArenas();
+    } catch (err) {
+      setErro(err instanceof Error ? err.message : 'Erro ao excluir');
+    }
+  }
+
   return (
     <div className="min-h-screen bg-background">
       <header className="flex items-center justify-between border-b-2 border-border bg-card px-4 py-4 sm:px-6">
@@ -328,9 +340,14 @@ export function MasterDashboard() {
                       <TableCell>{a.totalQuadras}</TableCell>
                       <TableCell className="font-mono text-xs">/agendar/{a.slug}</TableCell>
                       <TableCell>
-                        <Button size="sm" variant="outline" onClick={() => abrirEdicao(a.id)}>
-                          Editar
-                        </Button>
+                        <div className="flex gap-2">
+                          <Button size="sm" variant="outline" onClick={() => abrirEdicao(a.id)}>
+                            Editar
+                          </Button>
+                          <Button size="sm" variant="destructive" onClick={() => handleExcluir(a.id, a.nome)}>
+                            Excluir
+                          </Button>
+                        </div>
                       </TableCell>
                     </TableRow>
                   ))}

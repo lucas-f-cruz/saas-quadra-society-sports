@@ -64,7 +64,7 @@ model Usuario {
   criadoEm      DateTime @default(now())
 
   arenaId       String
-  arena         Arena    @relation(fields: [arenaId], references: [id])
+  arena         Arena    @relation(fields: [arenaId], references: [id], onDelete: Cascade)
 }
 
 model Quadra {
@@ -74,7 +74,7 @@ model Quadra {
   criadoEm  DateTime @default(now())
 
   arenaId   String
-  arena     Arena    @relation(fields: [arenaId], references: [id])
+  arena     Arena    @relation(fields: [arenaId], references: [id], onDelete: Cascade)
 
   regrasPreco RegraPreco[]
   reservas    Reserva[]
@@ -91,7 +91,7 @@ model RegraPreco {
   preco           Decimal    @db.Decimal(10, 2)
 
   quadraId        String
-  quadra          Quadra     @relation(fields: [quadraId], references: [id])
+  quadra          Quadra     @relation(fields: [quadraId], references: [id], onDelete: Cascade)
 }
 
 model Reserva {
@@ -109,7 +109,7 @@ model Reserva {
   criadoEm      DateTime      @default(now())
 
   quadraId      String
-  quadra        Quadra        @relation(fields: [quadraId], references: [id])
+  quadra        Quadra        @relation(fields: [quadraId], references: [id], onDelete: Cascade)
 
   // Evita duas reservas ativas no mesmo horário da mesma quadra
   @@unique([quadraId, data, horaInicio])

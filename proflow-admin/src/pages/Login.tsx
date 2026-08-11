@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import type { FormEvent } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -69,12 +69,14 @@ export function Login() {
             </Button>
           </form>
 
+          {/* Cadastro público desativado — descomente se precisar reativar.
           <p className="mt-5 text-center text-sm text-muted-foreground">
             Ainda não tem conta?{' '}
             <Link to="/signup" className="font-medium text-primary hover:underline">
               Criar conta
             </Link>
           </p>
+          */}
         </CardContent>
       </Card>
     </div>
